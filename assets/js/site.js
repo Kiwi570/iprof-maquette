@@ -35,6 +35,16 @@
   if (!hasGsap || calm) inkFigs.forEach(function (f) { f.classList.add("ink-done"); });
   setTimeout(function () { inkFigs.forEach(function (f) { f.classList.add("ink-done"); }); }, 3500);
 
+  /* ——— Photos qui se développent comme un tirage ——— */
+  var photos = d.querySelectorAll(".ph--photo:not([data-ink])");
+  if (calm || !("IntersectionObserver" in window)) photos.forEach(function (p) { p.classList.add("is-developed"); });
+  else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add("is-developed"); io.unobserve(en.target); } });
+    }, { threshold: 0.25 });
+    photos.forEach(function (p) { io.observe(p); });
+  }
+
   /* ——— Annotations entourées : tracé ajusté à la taille du texte ——— */
   var NS = "http://www.w3.org/2000/svg";
   function circlePath(w, h) {
@@ -95,6 +105,7 @@
       stopLenis();
       html.classList.remove("has-pen");
       inkFigs.forEach(function (f) { f.classList.add("ink-done"); });
+      photos.forEach(function (p) { p.classList.add("is-developed"); });
       circles.forEach(function (c) { c.path.style.strokeDasharray = ""; c.path.style.strokeDashoffset = ""; });
     } else {
       startLenis();
@@ -131,6 +142,8 @@
     if (!menu) return;
     menuBtn.setAttribute("aria-expanded", String(open));
     menuBtn.querySelector(".menu-btn__t").textContent = open ? "Fermer" : "Menu";
+    var rest = d.querySelectorAll("main, .site-footer, .skip");
+    rest.forEach(function (el) { el.inert = open; });
     if (open) {
       menu.hidden = false;
       if (lenis) lenis.stop();
@@ -170,8 +183,8 @@
     if (calm || !hasGsap || !sheet) return;
     e.preventDefault();
     if (menu && !menu.hidden) setMenu(false);
-    var label = (a.textContent || "").trim();
-    sheetLabel.textContent = label.length > 2 && label.length < 30 ? label : "iProf";
+    var NAMES = { "index.html": "Accueil", "cours-individuels.html": "Cours individuels", "conseils.html": "Conseils", "tarifs.html": "Tarifs", "a-propos.html": "À propos", "contact.html": "Contact", "mentions-legales.html": "Mentions légales" };
+    sheetLabel.textContent = NAMES[href.split("#")[0]] || "iProf";
     sess.set("iprof-sheet", "1");
     gsap.fromTo(sheet, { yPercent: 105 }, { yPercent: 0, duration: 0.55, ease: "power3.inOut", onComplete: function () { location.href = href; } });
   });
@@ -443,7 +456,12 @@
         var note = hero.querySelector(".sticky-note");
         if (note) intro.from(note, { y: -70, rotation: -28, autoAlpha: 0, duration: 0.9, ease: "back.out(1.7)" }, 1.25);
         var hs = hero.querySelector(".stamp");
-        if (hs) intro.from(hs, { scale: 2.4, autoAlpha: 0, duration: 0.45, ease: "power4.in" }, 1.35);
+        if (hs) intro.from(hs, { scale: 1.6, autoAlpha: 0, duration: 0.45, ease: "power4.in" }, 1.35);
+        var ruler = hero.querySelector(".ruler");
+        if (ruler) {
+          intro.fromTo(ruler, { clipPath: "inset(-20% 100% -20% 0)" }, { clipPath: "inset(-20% 0% -20% 0)", duration: 1, ease: "power2.inOut", clearProps: "clipPath" }, 0.95)
+            .from(ruler.querySelectorAll("li"), { y: 18, autoAlpha: 0, stagger: 0.09, duration: 0.6 }, 1.25);
+        }
       }
 
       // Croquis qui se dessinent et parallaxe
@@ -481,7 +499,7 @@
 
       // Fiches qui tombent sur la page
       gsap.utils.toArray("[data-drop]").forEach(function (el, i) {
-        gsap.from(el, { y: -90, rotation: i % 2 ? 9 : -9, autoAlpha: 0, duration: 1.1, ease: "back.out(1.3)", scrollTrigger: { trigger: el, start: "top 92%", once: true } });
+        gsap.from(el, { y: -60, rotation: i % 2 ? 6 : -6, autoAlpha: 0, duration: 1.1, ease: "back.out(1.3)", scrollTrigger: { trigger: el, start: "top 92%", once: true } });
       });
       gsap.utils.toArray(".theme").forEach(function (el, i) {
         gsap.from(el, { y: 60, autoAlpha: 0, duration: 0.9, delay: (i % 3) * 0.08, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 92%", once: true } });
@@ -491,8 +509,9 @@
       d.querySelectorAll(".jr").forEach(function (r) {
         var old = r.querySelector(".jr__old"), nw = r.querySelector(".jr__new");
         var tl = gsap.timeline({ scrollTrigger: desk ? { trigger: r, start: "top 72%", end: "top 38%", scrub: 0.6 } : { trigger: r, start: "top 80%", once: true } });
-        tl.to(old.firstElementChild, { backgroundSize: "100% .5em", duration: 1 }).to(old, { color: "rgba(30,34,48,.55)", duration: 1 }, 0)
-          .fromTo(nw, { clipPath: "inset(-30% 100% -30% -5%)" }, { clipPath: "inset(-30% -5% -30% -5%)", duration: 1.4, ease: "none" }, 0.6);
+        var k = desk ? 1 : 0.55;
+        tl.to(old.firstElementChild, { backgroundSize: "100% .5em", duration: 1 * k }).to(old, { color: "rgba(30,34,48,.55)", duration: 1 * k }, 0)
+          .fromTo(nw, { clipPath: "inset(-30% 100% -30% -5%)" }, { clipPath: "inset(-30% -5% -30% -5%)", duration: 1.4 * k, ease: desk ? "none" : "power1.out" }, 0.6 * k);
       });
       if (desk) {
         var jh = d.querySelector(".jargon__head");
@@ -514,11 +533,11 @@
       var zone = d.querySelector("[data-zone] .map");
       if (zone) {
         var zt = gsap.timeline({ scrollTrigger: { trigger: zone, start: "top 78%", once: true } });
-        if (window.DrawSVGPlugin) zt.from(zone.querySelector(".map__shore"), { drawSVG: "0%", duration: 2.2, ease: "power2.inOut" });
-        zt.from(zone.querySelector(".map__water"), { opacity: 0, duration: 1 }, "-=1.2")
-          .from(zone.querySelector(".map__zone"), { opacity: 0, scale: 0.6, transformOrigin: "15% 95%", duration: 1.2, ease: "power3.out" }, "-=0.8")
-          .from(zone.querySelectorAll(".map__town"), { scale: 0, opacity: 0, transformOrigin: "50% 50%", stagger: 0.14, duration: 0.5, ease: "back.out(3)" }, "-=0.7")
-          .from(zone.querySelectorAll(".map__lake, .map__note"), { opacity: 0, y: 10, stagger: 0.1, duration: 0.5 }, "-=0.3");
+        if (window.DrawSVGPlugin) zt.from(zone.querySelector(".map__shore"), { drawSVG: "0%", duration: 1.4, ease: "power2.inOut" });
+        zt.from(zone.querySelector(".map__water"), { opacity: 0, duration: 0.8 }, 0.5)
+          .from(zone.querySelector(".map__zone"), { opacity: 0, scale: 0.6, transformOrigin: "15% 95%", duration: 1, ease: "power3.out" }, 0.6)
+          .from(zone.querySelectorAll(".map__town"), { scale: 0, opacity: 0, transformOrigin: "50% 50%", stagger: 0.1, duration: 0.45, ease: "back.out(3)" }, 0.8)
+          .from(zone.querySelectorAll(".map__lake, .map__note"), { opacity: 0, y: 10, stagger: 0.1, duration: 0.45 }, 1.1);
         if (window.DrawSVGPlugin) zt.from(zone.querySelectorAll(".map__arrow"), { drawSVG: "0%", duration: 0.6 }, "<");
         var bubble = d.querySelector(".map__bubble");
         if (bubble) zt.from(bubble, { scale: 0, rotation: -25, transformOrigin: "0% 100%", duration: 0.7, ease: "back.out(2.2)" }, "-=0.1");
@@ -533,7 +552,7 @@
       // Tampons
       d.querySelectorAll("[data-stamp]").forEach(function (el) {
         if (el.closest(".hero")) return;
-        gsap.from(el, { scale: 2.3, autoAlpha: 0, duration: 0.45, ease: "power4.in", scrollTrigger: { trigger: el, start: "top 90%", once: true }, onComplete: function () { gsap.fromTo(el, { y: 2 }, { y: 0, duration: 0.25 }); } });
+        gsap.from(el, { scale: 1.6, autoAlpha: 0, duration: 0.45, ease: "power4.in", scrollTrigger: { trigger: el, start: "top 90%", once: true }, onComplete: function () { gsap.fromTo(el, { y: 2 }, { y: 0, duration: 0.25 }); } });
       });
 
       // Chiffres écrits à la main

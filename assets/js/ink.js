@@ -67,11 +67,15 @@ function fallback(fig) {
   fig.querySelector(".ph__frame").classList.add("ink-fallback");
 }
 
+let webglOK = null;
 function reveal(fig, delay = 0) {
   if (!fig || fig.dataset.inked) return;
   fig.dataset.inked = "1";
   const frame = fig.querySelector(".ph__frame");
   if (document.documentElement.classList.contains("calm")) { fig.classList.add("ink-done"); return; }
+  // pas de WebGL : repli direct, sans erreur console d'OGL
+  if (webglOK === null) { try { const c = document.createElement("canvas"); webglOK = !!(c.getContext("webgl") || c.getContext("experimental-webgl")); } catch (e) { webglOK = false; } }
+  if (!webglOK) { fallback(fig); return; }
   let renderer;
   try {
     renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: false, depth: false, dpr: Math.min(window.devicePixelRatio || 1, 2) });

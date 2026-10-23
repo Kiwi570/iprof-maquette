@@ -141,7 +141,7 @@ a:hover .ic--arrow, button:hover .ic--arrow { transform: translateX(4px); }
 .menu-btn__lines::after { top: 9.5px; }
 .menu-btn[aria-expanded="true"] .menu-btn__lines::before { top: 5px; transform: rotate(45deg); }
 .menu-btn[aria-expanded="true"] .menu-btn__lines::after { top: 5px; transform: rotate(-45deg); }
-.menu { position: fixed; inset: 0; z-index: 45; background-color: var(--paper); background-image: linear-gradient(to right, var(--grid) 1px, transparent 1px), linear-gradient(to bottom, var(--grid) 1px, transparent 1px); background-size: var(--cell) var(--cell); padding: calc(var(--header-h) + env(safe-area-inset-top, 0px) + 1.5rem) max(var(--gutter), env(safe-area-inset-right, 0px)) calc(7rem + env(safe-area-inset-bottom, 0px)) max(var(--gutter), env(safe-area-inset-left, 0px)); overflow-y: auto; }
+.menu { position: fixed; inset: 0; z-index: 45; background-color: var(--paper); background-image: linear-gradient(to right, var(--grid) 1px, transparent 1px), linear-gradient(to bottom, var(--grid) 1px, transparent 1px); background-size: var(--cell) var(--cell); padding: calc(var(--header-h) + env(safe-area-inset-top, 0px) + 1.5rem) max(var(--gutter), env(safe-area-inset-right, 0px)) calc(7rem + env(safe-area-inset-bottom, 0px)) max(var(--gutter), env(safe-area-inset-left, 0px)); overflow-y: auto; overscroll-behavior: contain; }
 .menu__list { list-style: none; margin: 0; padding: 0; display: grid; gap: .2rem; }
 .menu__list a { display: block; font-family: var(--f-display); font-weight: 560; font-size: clamp(2.2rem, 1.6rem + 3vw, 3.4rem); line-height: 1.15; color: var(--graphite); text-decoration: none; padding: .15em 0; border-bottom: 1px dashed var(--line); }
 .menu__list a[aria-current="page"] { color: var(--ink); }
@@ -234,7 +234,7 @@ a:hover .ic--arrow, button:hover .ic--arrow { transform: translateX(4px); }
 .map__shore { fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .map__town circle { fill: var(--red); }
 .map__town text { font-family: var(--f-hand); font-weight: 700; font-size: 28px; fill: var(--graphite); }
-.map__lake { font-family: var(--f-display); font-style: italic; font-size: 24px; fill: var(--ink); opacity: .65; letter-spacing: .04em; }
+.map__lake { font-family: var(--f-display); font-style: italic; font-size: 24px; fill: var(--ink); opacity: .85; letter-spacing: .04em; }
 .map__arrow { fill: none; stroke: var(--red); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .map__note { font-family: var(--f-hand); font-weight: 700; font-size: 26px; fill: var(--red); }
 .map__bubble { position: absolute; right: 4%; bottom: 8%; display: inline-flex; align-items: center; gap: .5rem; margin: 0; padding: .5rem 1rem .55rem; background: var(--paper-card); border: 2px solid var(--ink); border-radius: 20px 20px 20px 4px; color: var(--ink); font-family: var(--f-hand); font-weight: 700; font-size: 1.6rem; line-height: 1; transform: rotate(3deg); box-shadow: var(--shadow); }
@@ -257,7 +257,7 @@ a:hover .ic--arrow, button:hover .ic--arrow { transform: translateX(4px); }
 .stamp { display: inline-block; margin: 0; font-family: var(--f-body); font-weight: 800; font-size: .9rem; line-height: 1; letter-spacing: .16em; text-transform: uppercase; color: var(--red); border: 2.5px solid currentColor; outline: 1.5px solid currentColor; outline-offset: 3px; padding: .6rem .85rem .55rem; border-radius: 4px; transform: rotate(var(--srot, -7deg)); background: rgba(255, 255, 254, .55); -webkit-mask: var(--grunge) 0 0 / 160px 160px; mask: var(--grunge) 0 0 / 160px 160px; }
 .stamp--hero { position: absolute; left: -1rem; top: -1.4rem; z-index: 4; font-size: 1rem; }
 .stamp--s { --srot: 6deg; margin-top: 1rem; justify-self: start; }
-.stamp--demo { color: var(--graphite-2); --srot: 5deg; }
+.stamp--demo { color: var(--graphite-2); --srot: 5deg; -webkit-mask: none; mask: none; }
 
 /* Tarifs (accueil) */
 .tt__grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(2rem, 6vw, 6rem); align-items: center; }
@@ -370,7 +370,7 @@ html.calm .sheet { display: none; }
 .mini { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
 .mini li { font-size: .9rem; font-weight: 800; border: 1.5px solid var(--line-strong); border-radius: 999px; padding: .25rem .75rem; background: var(--paper-card); }
 .theme__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem; margin-top: auto; }
-.theme[hidden] { display: none !important; }
+[hidden], .theme[hidden] { display: none !important; }
 .indep__fig { max-width: 420px; justify-self: end; --rot: 1.6deg; }
 
 /* ——— Tarifs ——— */
@@ -607,3 +607,6 @@ html.lenis, html.lenis body { height: auto; }
 .ph--photo .ph__cap { font-size: 1.22rem; color: var(--ink); }
 @media (max-width: 899px) { .ph--hero.has-mobile .ph__frame { aspect-ratio: 4 / 5; } }
 @media (hover: hover) and (pointer: fine) { .ph:hover .ph__frame img { scale: 1.04; } }
+
+/* audit : cibles tactiles */
+.foot__nav a { min-height: 44px; display: inline-flex; align-items: center; }

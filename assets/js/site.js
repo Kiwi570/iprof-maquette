@@ -148,7 +148,7 @@
       menu.hidden = false;
       if (lenis) lenis.stop();
       d.body.style.overflow = "hidden";
-      if (hasGsap && !calm) gsap.from(menu.querySelectorAll(".menu__list li, .menu__contact"), { y: 30, autoAlpha: 0, duration: 0.5, stagger: 0.05, ease: "power3.out" });
+      if (hasGsap && !calm) gsap.fromTo(menu.querySelectorAll(".menu__list li, .menu__contact"), { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, stagger: 0.05, ease: "power3.out", overwrite: true });
       var first = menu.querySelector("a");
       if (first) first.focus();
     } else {
@@ -158,6 +158,8 @@
     }
   }
   if (menuBtn) menuBtn.addEventListener("click", function () { setMenu(menu.hidden); });
+  // fenêtre élargie menu ouvert : le bouton disparaît, on referme pour ne pas laisser la page inerte
+  window.addEventListener("resize", function () { if (menu && !menu.hidden && menuBtn.offsetParent === null) setMenu(false); });
   d.addEventListener("keydown", function (e) { if (e.key === "Escape" && menu && !menu.hidden) { setMenu(false); menuBtn.focus(); } });
 
   /* ——— Transitions de page : une feuille qui glisse ——— */
@@ -178,7 +180,9 @@
     var href = a.getAttribute("href");
     if (!/^[a-z0-9-]+\.html(#[\w-]+)?$/i.test(href)) return;
     var url = new URL(href, location.href);
-    if (url.pathname === location.pathname) return;
+    // même page (avec ou sans .html, cleanUrls en ligne) : pas de transition ni de rechargement
+    var norm = function (p) { return p.replace(/\/index(\.html)?$/, "/").replace(/\.html$/, ""); };
+    if (norm(url.pathname) === norm(location.pathname)) return;
     if (a.dataset.topic) sess.set("iprof-topic", a.dataset.topic);
     if (calm || !hasGsap || !sheet) return;
     e.preventDefault();
@@ -510,7 +514,7 @@
         var old = r.querySelector(".jr__old"), nw = r.querySelector(".jr__new");
         var tl = gsap.timeline({ scrollTrigger: desk ? { trigger: r, start: "top 72%", end: "top 38%", scrub: 0.6 } : { trigger: r, start: "top 80%", once: true } });
         var k = desk ? 1 : 0.55;
-        tl.to(old.firstElementChild, { backgroundSize: "100% .5em", duration: 1 * k }).to(old, { color: "rgba(30,34,48,.55)", duration: 1 * k }, 0)
+        tl.to(old.firstElementChild, { backgroundSize: "100% .5em", duration: 1 * k }).to(old, { color: "rgba(30,34,48,.7)", duration: 1 * k }, 0)
           .fromTo(nw, { clipPath: "inset(-30% 100% -30% -5%)" }, { clipPath: "inset(-30% -5% -30% -5%)", duration: 1.4 * k, ease: desk ? "none" : "power1.out" }, 0.6 * k);
       });
       if (desk) {

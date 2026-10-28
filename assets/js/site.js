@@ -137,11 +137,43 @@
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
+  /* ——— Hauteurs réelles (en-tête, barre du bas) et barre masquée sur l'ouverture, le formulaire, le pied et le menu ——— */
+  var callbar = d.querySelector(".callbar");
+  var bar = { hero: false, zones: 0, menu: false };
+  function syncBar() { html.classList.toggle("bar-off", page === "404" || bar.hero || bar.zones > 0 || bar.menu); }
+  function setBars() {
+    html.style.setProperty("--entete-h", headerH() + "px");
+    html.style.setProperty("--barres-h", (callbar ? callbar.offsetHeight : 0) + "px");
+  }
+  setBars();
+  if ("ResizeObserver" in window) {
+    var ro = new ResizeObserver(setBars);
+    [d.querySelector(".site-header"), callbar].forEach(function (el) { if (el) ro.observe(el); });
+  } else window.addEventListener("resize", setBars);
+  if ("IntersectionObserver" in window) {
+    var heroEl = d.querySelector("main .hero");
+    if (heroEl) {
+      bar.hero = true;
+      new IntersectionObserver(function (en) { bar.hero = en[0].isIntersecting; syncBar(); }).observe(heroEl);
+    }
+    var zoneIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var was = en.target.__in === true;
+        if (en.isIntersecting !== was) { en.target.__in = en.isIntersecting; bar.zones += en.isIntersecting ? 1 : -1; }
+      });
+      syncBar();
+    });
+    d.querySelectorAll("#rdv-form, .site-footer").forEach(function (el) { zoneIo.observe(el); });
+  }
+  syncBar();
+
   var menuBtn = d.querySelector(".menu-btn"), menu = d.getElementById("menu");
   function setMenu(open) {
     if (!menu) return;
     menuBtn.setAttribute("aria-expanded", String(open));
     menuBtn.querySelector(".menu-btn__t").textContent = open ? "Fermer" : "Menu";
+    bar.menu = open;
+    syncBar();
     var rest = d.querySelectorAll("main, .site-footer, .skip");
     rest.forEach(function (el) { el.inert = open; });
     if (open) {

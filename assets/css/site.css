@@ -610,3 +610,36 @@ html.lenis, html.lenis body { height: auto; }
 
 /* audit : cibles tactiles */
 .foot__nav a { min-height: 44px; display: inline-flex; align-items: center; }
+
+/* audit : titre d'accueil plafonné à sa colonne (avec ou sans A+) */
+.hero--home .hero__text { container-type: inline-size; }
+.hero--home .display { font-size: min(clamp(2.5rem, 1.3rem + 4.2vw, 5.3rem), 14cqi); }
+
+/* audit : sections épinglées tenues dans l'écran, sous l'en-tête mesuré (--entete-h) */
+@media (min-width: 900px) {
+  .stack__card { --pad: clamp(1.2rem, 3vw, 2.4rem); --top: calc(var(--entete-h, var(--header-h)) + 1.5rem + var(--i, 0) * 16px); top: var(--top); padding: var(--pad); }
+  .stack__card .ph { display: flex; flex-direction: column; max-height: calc(100svh - var(--top) - 2 * var(--pad) - 1rem); }
+  .stack__card .ph__frame { flex: 1 1 auto; min-height: 0; }
+  .stack__card .ph__cap { flex: none; }
+  .jargon__head { display: flex; flex-direction: column; max-height: calc(100svh - var(--entete-h, var(--header-h)) - 48px); }
+  .jargon__head > * { flex: none; }
+  .jargon__head > .jargon__fig { flex: 0 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  .jargon__fig .ph__frame { flex: 1 1 auto; min-height: 0; }
+}
+
+/* audit : lien e-mail à 44 px de haut */
+.copyrow__mail a { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* audit : barre d'appel du bas — colonnes souples, hauteur réelle réservée, masquée sur l'ouverture, le formulaire, le pied et le menu */
+@media (max-width: 760px) {
+  .callbar { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .callbar, .comfort { transition: transform .35s var(--ease), visibility .35s; }
+  html.bar-off .callbar, html.bar-off .comfort { transform: translateY(calc(100% + 24px)); visibility: hidden; }
+  .site { padding-bottom: var(--barres-h, 76px); }
+}
+@media (max-width: 359px) {
+  .callbar { grid-template-columns: auto minmax(0, 1fr); }
+  .callbar .btn--ink { min-width: 52px; }
+  .callbar .btn--ink span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+.foot__nav a { min-width: 44px; }
